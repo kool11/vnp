@@ -624,7 +624,6 @@ class CtaEngine(AppEngine):
         for key in strategy.syncList:
             if key in d:
                 strategy.__setattr__(key, d[key])
-        strategy.pos = 0
                 
     #----------------------------------------------------------------------
     def roundToPriceTick(self, priceTick, price):
