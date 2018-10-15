@@ -1,0 +1,7 @@
+[
+    {
+        "name": "wfft",
+        "className": "WfftStrategy",
+        "vtSymbol": "rb1901"
+    }
+]
