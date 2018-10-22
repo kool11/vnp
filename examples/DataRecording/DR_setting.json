@@ -4,18 +4,23 @@
 
     "tick":
     [
-        ["rb1901", "CTP"],
-        ["cu1811", "CTP"]
+        ["IF1810", "CTP"],
+        ["IF1812", "CTP"],
+        ["IF1903", "CTP"],
+        ["IF1811", "CTP"]
     ],
 
     "bar":
     [
-        ["rb1901", "CTP"],
-        ["cu1811", "CTP"]
+        ["IF1810", "CTP"],
+        ["IF1812", "CTP"],
+        ["IF1903", "CTP"],
+        ["IF1811", "CTP"]
     ],
 
     "active":
     {
-        "rb.HOT": "rb1901"
+        "IF.HOT": "IF1810",
+        "IF.HOT": "IF1903"
     }
 }

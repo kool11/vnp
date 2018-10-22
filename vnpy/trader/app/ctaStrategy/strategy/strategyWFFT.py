@@ -11,18 +11,17 @@ import time
 import WFFT
 
 
-
 class WfftStrategy(CtaTemplate):
     className = 'WfftStrategy'
     
     initDays = 10     
 
     N = 25
-    len_ = 50
+    len_ = 40
     q = 15
     Tq = 0.0001
     Length = 30
-    Dq = 1.5
+    Dq = 0.5
 
     BarsSinceEntry = -1
 
@@ -31,7 +30,7 @@ class WfftStrategy(CtaTemplate):
 
     TrailingStart = 72
     TrailingStop = 27
-    MinPoint = 0.01
+    MinPoint = 0.2
     StopLossSet = 37
     paramList = ['name',
                  'className',
@@ -118,14 +117,14 @@ class WfftStrategy(CtaTemplate):
             price = list1[1]
             vol = int(list1[2])
             if direction == 3:
-                ll = self.sell(price-1, vol)
+                ll = self.sell(price-self.MinPoint*5, vol)
                 print('sell')
                 if len(ll):
                     self.BarsSinceEntry = 0
                     #self.MyEntryPrice = []
                     self.pos2 = 0
             elif direction == 4:
-                ll = self.cover(price+1, vol)
+                ll = self.cover(price+self.MinPoint*5, vol)
                 print('cover')
                 if len(ll):
                     self.BarsSinceEntry = 0
@@ -133,7 +132,6 @@ class WfftStrategy(CtaTemplate):
                     self.pos2 = 0
 
             print('-----finish----------')
-
 
     # ----------------------------------------------------------------------
     def onBar(self, bar):
@@ -148,8 +146,6 @@ class WfftStrategy(CtaTemplate):
 
         if self.pos2 != 0:
             self.BarsSinceEntry = self.BarsSinceEntry+1
-
-        print('-----onBar-----')
 
         list1 = self.wfft.onNewBar(date, time, open_, high, low, close, volume, self.pos2)
 
@@ -208,20 +204,23 @@ class WfftStrategy(CtaTemplate):
 
         list1 = self.wfft.stopLoss(int(self.pos2),int(self.BarsSinceEntry),high,close,open_,low)
         if len(list1) == 3:
+            print(bar.date + ' ' + bar.time)
+            print(self.BarsSinceEntry)
             print('----stoploss----')
+            print(self.pos, self.pos2)
 
             direction = int(list1[0])
             price = list1[1]
             vol = int(list1[2])
             if direction == 3:
-                ll = self.sell(price - 1, vol)
+                ll = self.sell(price - self.MinPoint*5, vol)
                 print('sell')
                 if len(ll):
                     self.BarsSinceEntry = 0
                     #self.MyEntryPrice = []
                     self.pos2 = 0
             elif direction == 4:
-                ll = self.cover(price + 1, vol)
+                ll = self.cover(price + self.MinPoint*5, vol)
                 print('cover')
                 if len(ll):
                     self.BarsSinceEntry = 0
@@ -229,9 +228,6 @@ class WfftStrategy(CtaTemplate):
                     self.pos2 = 0
 
             print('-----finish----------')
-
-
-        print('----onBarfinish----')
 
     def onOrder(self, order):
         pass
@@ -252,8 +248,6 @@ class WfftStrategy(CtaTemplate):
             #self.BarsSinceEntry = 0
             #self.pos = 0
             self.wfft.onNewTrade(trade.price, False)
-
-
 
     def onStopOrder(self, so):
         pass

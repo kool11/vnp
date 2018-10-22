@@ -549,9 +549,6 @@ class DataEngine(object):
             d = f['data']
             for key, value in d.items():
                 self.contractDict[key] = value
-                if key=='rb1901':
-                    print(value.priceTick)
-                    print(value.size)
         f.close()
         
     #----------------------------------------------------------------------

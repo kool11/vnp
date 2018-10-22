@@ -659,5 +659,3 @@ class CtaEngine(AppEngine):
         if contract:
             return contract.priceTick
         return 0
-        
-        

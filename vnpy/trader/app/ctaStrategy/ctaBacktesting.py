@@ -124,7 +124,7 @@ class BacktestingEngine(object):
     #------------------------------------------------
     
     #----------------------------------------------------------------------
-    def setStartDate(self, startDate='20100416', initDays=10):
+    def setStartDate(self, startDate='20100416', initDays=0):
         """设置回测的启动日期"""
         self.startDate = startDate
         self.initDays = initDays
@@ -196,6 +196,7 @@ class BacktestingEngine(object):
     
     #----------------------------------------------------------------------
     def loadHistoryData(self):
+        print(self.strategyStartDate)
         """载入历史数据"""
         self.dbClient = pymongo.MongoClient(globalSetting['mongoHost'], globalSetting['mongoPort'])
         collection = self.dbClient[self.dbName][self.symbol]          
