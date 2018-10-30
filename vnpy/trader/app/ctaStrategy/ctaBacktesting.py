@@ -124,7 +124,7 @@ class BacktestingEngine(object):
     #------------------------------------------------
     
     #----------------------------------------------------------------------
-    def setStartDate(self, startDate='20100416', initDays=0):
+    def setStartDate(self, startDate='20100416', initDays=1):
         """设置回测的启动日期"""
         self.startDate = startDate
         self.initDays = initDays
@@ -478,7 +478,7 @@ class BacktestingEngine(object):
         order.orderID = orderID
         order.vtOrderID = orderID
         order.orderTime = self.dt.strftime('%H:%M:%S')
-        
+
         # CTA委托类型映射
         if orderType == CTAORDER_BUY:
             order.direction = DIRECTION_LONG

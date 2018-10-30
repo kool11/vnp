@@ -16,8 +16,8 @@ class WfftStrategy(CtaTemplate):
     
     initDays = 10     
 
-    N = 25
-    len_ = 40
+    N = 15
+    len_ = 30
     q = 15
     Tq = 0.0001
     Length = 30
@@ -28,10 +28,10 @@ class WfftStrategy(CtaTemplate):
     HighestAfterEntry = []
     LowestAfterEntry = []
 
-    TrailingStart = 72
-    TrailingStop = 27
+    TrailingStart = 40
+    TrailingStop = 5
     MinPoint = 0.2
-    StopLossSet = 37
+    StopLossSet = 40
     paramList = ['name',
                  'className',
                  'author',
@@ -65,7 +65,7 @@ class WfftStrategy(CtaTemplate):
         self.bg = BarGenerator(self.onBar, 5)  
         self.am = ArrayManager()
 
-        self.wfft = WFFT.pythonToCpp()
+        self.wfft = WFFT.pythonToCpp(int(1))
         self.wfft.setWfftSetting(self.N, self.len_, self.q, self.Tq, self.Length, self.Dq,
                                  int(self.TrailingStart), int(self.TrailingStop),
                                  float(self.MinPoint), int(self.StopLossSet))
@@ -148,12 +148,15 @@ class WfftStrategy(CtaTemplate):
             self.BarsSinceEntry = self.BarsSinceEntry+1
 
         list1 = self.wfft.onNewBar(date, time, open_, high, low, close, volume, self.pos2)
+        for c in list1:
+            print(c,)
+        print("---------------------")
 
         if len(list1) == 4:
-            direction = int(list1[1])
-            price = list1[2]
-            vol = int(list1[3])
-            print(self.pos, self.pos2, direction, list1[0])
+            direction = int(list1[0])
+            price = list1[1]
+            vol = int(list1[2])
+            print(self.pos, self.pos2, direction, list1[3])
             if direction == 1:
                 self.buy(price, vol)
                 self.pos2 = 1
@@ -175,10 +178,10 @@ class WfftStrategy(CtaTemplate):
             self.BarsSinceEntry = 0
         elif len(list1) == 7:
             print('two following steps')
-            direction = int(list1[1])
-            price = list1[2]
-            vol = int(list1[3])
-            print(self.pos, self.pos2, direction, list1[0])
+            direction = int(list1[0])
+            price = list1[1]
+            vol = int(list1[2])
+            print(self.pos, self.pos2, direction, list1[6])
             if direction == 3:
                 ll = self.sell(price-self.MinPoint*5, vol)
                 if len(ll):
@@ -189,9 +192,9 @@ class WfftStrategy(CtaTemplate):
                 if len(ll):
                     self.pos2 = 0
                 print('cover')
-            direction2 = int(list1[4])
-            price2 = list1[5]
-            vol2 = int(list1[6])
+            direction2 = int(list1[3])
+            price2 = list1[4]
+            vol2 = int(list1[5])
             if direction2 == 1:
                 self.buy(price2, vol2)
                 self.pos2 = 1
