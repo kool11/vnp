@@ -273,7 +273,15 @@ class MainEngine(object):
             'gateway': log.gatewayName
         }
         self.dbInsert(LOG_DB_NAME, self.todayDate, d)
-    
+
+    def dbUpdateTradeRecord(self,dbName,collectionName,req):
+        if self.dbClient:
+            db = self.dbClient[dbName]
+            collection = db[collectionName]
+            collection.insert_one(req)
+        else:
+            print('connect failed')
+
     #----------------------------------------------------------------------
     def getTick(self, vtSymbol):
         """查询行情"""

@@ -23,8 +23,9 @@ from vnpy.trader.app import AppEngine
 
 from .ctaBase import *
 from .strategy import STRATEGY_CLASS
+import time
 
-
+Trade_DB_NAME='TraderRecord'
 ########################################################################
 class CtaEngine(AppEngine):
     """CTA策略引擎"""
@@ -79,8 +80,22 @@ class CtaEngine(AppEngine):
         
         # 注册事件监听
         self.registerEvent()
- 
-    #----------------------------------------------------------------------
+
+    def temp(self):
+        print('add record')
+        #contract = self.mainEngine.getContract('IF1812')
+        dict1={'symbol':'IF1812','date':'20181119','time':'09:34:01','price':3274.6,
+               'volume':1,'direction':'LONG','offset':'OPEN'
+               }
+
+        self.mainEngine.dbUpdateTradeRecord(Trade_DB_NAME, 'MSDStrategy', dict1)
+
+        dict2 = {'symbol': 'IF1812', 'date': '20181119', 'time': '15:00:00', 'price': 3296.4,
+                 'volume': 1, 'direction': 'SHORT', 'offset': 'CLOSE'
+                 }
+        self.mainEngine.dbUpdateTradeRecord(Trade_DB_NAME, 'MSDStrategy', dict2)
+
+        #----------------------------------------------------------------------
     def sendOrder(self, vtSymbol, orderType, price, volume, strategy):
         """发单"""
         contract = self.mainEngine.getContract(vtSymbol)
@@ -97,7 +112,9 @@ class CtaEngine(AppEngine):
         
         # 设计为CTA引擎发出的委托只允许使用限价单
         req.priceType = PRICETYPE_LIMITPRICE #PRICETYPE_MARKETPRICE
-        
+
+        direction='LONG'
+        offset='OPEN'
         # CTA委托类型映射
         if orderType == CTAORDER_BUY:
             req.direction = DIRECTION_LONG
@@ -107,15 +124,21 @@ class CtaEngine(AppEngine):
             req.direction = DIRECTION_SHORT
             req.offset = OFFSET_CLOSE
             #req.priceType = PRICETYPE_MARKETPRICE
+            direction = 'SHORT'
+            offset = 'CLOSE'
                 
         elif orderType == CTAORDER_SHORT:
             req.direction = DIRECTION_SHORT
             req.offset = OFFSET_OPEN
+            direction = 'SHORT'
+            offset = 'OPEN'
             
         elif orderType == CTAORDER_COVER:
             req.direction = DIRECTION_LONG
             req.offset = OFFSET_CLOSE
             #req.priceType = PRICETYPE_MARKETPRICE
+            direction = 'LONG'
+            offset = 'CLOSE'
             
         # 委托转换
         reqList = self.mainEngine.convertOrderReq(req)
@@ -133,9 +156,19 @@ class CtaEngine(AppEngine):
             
         self.writeCtaLog(u'策略%s发送委托，%s，%s,%s,，%s@%s,%s'
                          %(strategy.name, vtSymbol, req.direction,req.offset, volume, price,vtOrderID))
+
+        date=d.datetime.now().strftime("%Y.%m.%d")
+        time =d.datetime.now().strftime("%H:%M:%S")
+
+        dict1 = {'symbol': req.symbol, 'date': date, 'time': time, 'price': req.price,
+                 'volume': 1, 'direction': direction, 'offset': offset
+                 }
+        self.mainEngine.dbUpdateTradeRecord(Trade_DB_NAME, strategy.className,dict1)
+        #addTradeRecord(req) req.symbol,req.vtSymbol,req.offset,req.direction,req.price,req.volume
         
         return vtOrderIDList
-    
+
+
     #----------------------------------------------------------------------
     def cancelOrder(self, vtOrderID):
         """撤单"""
@@ -287,7 +320,6 @@ class CtaEngine(AppEngine):
         order = event.dict_['data']
         
         vtOrderID = order.vtOrderID
-        #temp = str(order.status).decode('unicode-escape').encode('gb18030')
         print('processOrder', vtOrderID)
         if vtOrderID in self.orderStrategyDict:
             strategy = self.orderStrategyDict[vtOrderID]            
@@ -309,7 +341,7 @@ class CtaEngine(AppEngine):
         if trade.vtTradeID in self.tradeSet:
             return
         self.tradeSet.add(trade.vtTradeID)
-        print('process trade:',trade.vtOrderID)
+        #print('process trade:',trade.vtOrderID)
         # 将成交推送到策略对象中
         if trade.vtOrderID in self.orderStrategyDict:
             strategy = self.orderStrategyDict[trade.vtOrderID]
@@ -319,7 +351,7 @@ class CtaEngine(AppEngine):
                 strategy.pos += trade.volume
             else:
                 strategy.pos -= trade.volume
-            print('on trade:',strategy.pos)
+            #print('on trade:',strategy.pos)
             self.callStrategyFunc(strategy, strategy.onTrade, trade)
             
             # 保存策略持仓到数据库
@@ -442,6 +474,7 @@ class CtaEngine(AppEngine):
                 strategy.inited = True
                 
                 self.loadSyncData(strategy)                             # 初始化完成后加载同步数据
+                strategy.pos=1
                 self.subscribeMarketData(strategy)                      # 加载同步数据后再订阅行情
             else:
                 self.writeCtaLog(u'请勿重复初始化策略实例：%s' %name)

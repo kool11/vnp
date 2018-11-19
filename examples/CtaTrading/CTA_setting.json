@@ -3,7 +3,12 @@
     {
         "name": "MSD",
         "className": "MSDStrategy",
-        "vtSymbol": "IF1812"
+        "vtSymbol": "IF1812",
+        "threshold": -0.12,
+        "TrailingStart": 150,
+        "TrailingStop": 15,
+        "MinPoint": 0.2,
+        "StopLossSet": 130
     }
 
 ]

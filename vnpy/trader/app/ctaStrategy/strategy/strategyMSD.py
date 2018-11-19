@@ -34,7 +34,7 @@ class MSDStrategy(CtaTemplate):
                'trading',
                'pos']
 
-    syncList = []
+    syncList = ['pos']
 
     # ----------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ class MSDStrategy(CtaTemplate):
         self.bg = BarGenerator(self.onBar, 1, self.onBar)
         self.wrapper = MSDStrategyWrapper()
         self.wrapper.setSettingWrapper(self.threshold,
-                                       150,15, 0.2, 130)
+                                       self.TrailingStart,self.TrailingStop, self.MinPoint,self.StopLossSet)
 
     def onInit(self):
         """初始化策略（必须由用户继承实现）"""
