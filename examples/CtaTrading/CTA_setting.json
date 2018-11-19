@@ -1,9 +1,9 @@
 [
 
     {
-        "name": "wfft",
-        "className": "WfftStrategy",
-        "vtSymbol": "IF1811"
+        "name": "MSD",
+        "className": "MSDStrategy",
+        "vtSymbol": "IF1812"
     }
 
 ]
