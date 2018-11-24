@@ -23,7 +23,7 @@ from vnpy.trader.app import AppEngine
 
 from .ctaBase import *
 from .strategy import STRATEGY_CLASS
-import time
+import datetime as dt
 
 Trade_DB_NAME='TraderRecord'
 ########################################################################
@@ -83,8 +83,9 @@ class CtaEngine(AppEngine):
 
     def temp(self):
         print('add record')
+        self.sendOrder(CTAORDER_BUY, 1000, 1)
         #contract = self.mainEngine.getContract('IF1812')
-        dict1={'symbol':'IF1812','date':'20181119','time':'09:34:01','price':3274.6,
+        '''dict1={'symbol':'IF1812','date':'20181119','time':'09:34:01','price':3274.6,
                'volume':1,'direction':'LONG','offset':'OPEN'
                }
 
@@ -93,11 +94,13 @@ class CtaEngine(AppEngine):
         dict2 = {'symbol': 'IF1812', 'date': '20181119', 'time': '15:00:00', 'price': 3296.4,
                  'volume': 1, 'direction': 'SHORT', 'offset': 'CLOSE'
                  }
-        self.mainEngine.dbUpdateTradeRecord(Trade_DB_NAME, 'MSDStrategy', dict2)
+        self.mainEngine.dbUpdateTradeRecord(Trade_DB_NAME, 'MSDStrategy', dict2)'''
 
         #----------------------------------------------------------------------
+
     def sendOrder(self, vtSymbol, orderType, price, volume, strategy):
         """发单"""
+        print(orderType)
         contract = self.mainEngine.getContract(vtSymbol)
         
         req = VtOrderReq()
@@ -139,26 +142,25 @@ class CtaEngine(AppEngine):
             #req.priceType = PRICETYPE_MARKETPRICE
             direction = 'LONG'
             offset = 'CLOSE'
-            
+
         # 委托转换
         reqList = self.mainEngine.convertOrderReq(req)
         vtOrderIDList = []
-        
+
         if not reqList:
             return vtOrderIDList
-        
+
         for convertedReq in reqList:
-            vtOrderID = self.mainEngine.sendOrder(convertedReq, contract.gatewayName)    # 发单
-            print('send order:', vtOrderID)
-            self.orderStrategyDict[vtOrderID] = strategy                                 # 保存vtOrderID和策略的映射关系
-            self.strategyOrderDict[strategy.name].add(vtOrderID)                         # 添加到策略委托号集合中
+            vtOrderID = self.mainEngine.sendOrder(convertedReq, contract.gatewayName)  # 发单
+            self.orderStrategyDict[vtOrderID] = strategy  # 保存vtOrderID和策略的映射关系
+            self.strategyOrderDict[strategy.name].add(vtOrderID)  # 添加到策略委托号集合中
             vtOrderIDList.append(vtOrderID)
             
         self.writeCtaLog(u'策略%s发送委托，%s，%s,%s,，%s@%s,%s'
                          %(strategy.name, vtSymbol, req.direction,req.offset, volume, price,vtOrderID))
 
-        date=d.datetime.now().strftime("%Y.%m.%d")
-        time =d.datetime.now().strftime("%H:%M:%S")
+        date = dt.datetime.now().strftime("%Y%m%d")
+        time = dt.datetime.now().strftime("%H:%M:%S")
 
         dict1 = {'symbol': req.symbol, 'date': date, 'time': time, 'price': req.price,
                  'volume': 1, 'direction': direction, 'offset': offset
@@ -474,7 +476,7 @@ class CtaEngine(AppEngine):
                 strategy.inited = True
                 
                 self.loadSyncData(strategy)                             # 初始化完成后加载同步数据
-                strategy.pos=1
+                #strategy.pos=1
                 self.subscribeMarketData(strategy)                      # 加载同步数据后再订阅行情
             else:
                 self.writeCtaLog(u'请勿重复初始化策略实例：%s' %name)
