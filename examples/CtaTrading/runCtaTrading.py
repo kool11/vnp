@@ -18,8 +18,10 @@ from vnpy.trader.vtEngine import MainEngine, LogEngine
 from vnpy.trader.gateway import ctpGateway
 from vnpy.trader.app import ctaStrategy
 from vnpy.trader.app.ctaStrategy.ctaBase import EVENT_CTA_LOG
+from vnpy.trader.app.ctaStrategy import strategy
+from vnpy.trader.app.ctaStrategy.strategy.MSDstrategy import MSDStrategy
 
-
+strategy.STRATEGY_CLASS['MSDStrategy'] = MSDStrategy
 
 #----------------------------------------------------------------------
 def processErrorEvent(event):
@@ -72,7 +74,11 @@ def runChildProcess():
     
     cta.startAll()
     le.info(u'CTA策略启动成功')
-    
+
+    #l = cta.strategyDict['MSD']
+    #l.buy(200,1)
+    #l.sell(300,1)
+
     while True:
         sleep(1)
 

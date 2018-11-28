@@ -132,7 +132,8 @@ class BacktestingEngine(object):
         self.dataStartDate = datetime.strptime(startDate, '%Y%m%d')
         
         initTimeDelta = timedelta(initDays)
-        self.strategyStartDate = self.dataStartDate + initTimeDelta
+        self.strategyStartDate  = self.dataStartDate + initTimeDelta
+        print(self.strategyStartDate)
         
     #----------------------------------------------------------------------
     def setEndDate(self, endDate=''):
@@ -218,8 +219,8 @@ class BacktestingEngine(object):
                                                         self.dataStartDate,
                                                         self.strategyStartDate)
         else:
-            flt = {'datetime':{'$gte':self.dataStartDate,
-                               '$lt':self.strategyStartDate}}        
+            flt = {'datetime':{'$gte': self.dataStartDate,
+                               '$lt': self.strategyStartDate}}
             initCursor = collection.find(flt).sort('datetime')
         
         # 将数据从查询指针中读取出，并生成列表
@@ -242,6 +243,7 @@ class BacktestingEngine(object):
                 flt = {'datetime':{'$gte':self.strategyStartDate,
                                    '$lte':self.dataEndDate}}  
             self.dbCursor = collection.find(flt).sort('datetime')
+            print(self.dbCursor.count())
         
         if isinstance(self.dbCursor, list):
             count = len(initCursor) + len(self.dbCursor)
