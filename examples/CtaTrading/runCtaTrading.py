@@ -19,7 +19,7 @@ from vnpy.trader.gateway import ctpGateway
 from vnpy.trader.app import ctaStrategy
 from vnpy.trader.app.ctaStrategy.ctaBase import EVENT_CTA_LOG
 from vnpy.trader.app.ctaStrategy import strategy
-from vnpy.trader.app.ctaStrategy.strategy.MSDstrategy import MSDStrategy
+from MSDstrategy import MSDStrategy
 
 strategy.STRATEGY_CLASS['MSDStrategy'] = MSDStrategy
 
